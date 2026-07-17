@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "zeon cooler",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "fan simulator",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "description": "cool game made by claude code"
+}
