@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ВЕНТИЛЯТОР vs ЗЕОН</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+
+:root{
+  --bg-deep:#0a1410;
+  --bg-panel:#0f1f19;
+  --bg-panel2:#122922;
+  --copper:#c9963c;
+  --cool:#5ad1e0;
+  --amber:#ffb020;
+  --heat:#ff4d3d;
+  --text-main:#d8f0e0;
+  --text-dim:#6f9284;
+  --line:#1e3a30;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+body{
+  background:
+    radial-gradient(circle at 50% 0%, #10241d 0%, var(--bg-deep) 55%),
+    repeating-linear-gradient(0deg, rgba(201,150,60,0.025) 0px, rgba(201,150,60,0.025) 1px, transparent 1px, transparent 24px),
+    repeating-linear-gradient(90deg, rgba(201,150,60,0.025) 0px, rgba(201,150,60,0.025) 1px, transparent 1px, transparent 24px);
+  color:var(--text-main);
+  font-family:'Rajdhani', sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  overflow-x:hidden;
+}
+
+.wrap{
+  width:100%;
+  max-width:520px;
+}
+
+.eyebrow{
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  letter-spacing:3px;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:6px;
+}
+
+h1{
+  font-size:28px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:var(--text-main);
+  margin-bottom:2px;
+}
+h1 span{color:var(--copper);}
+
+.subtitle{
+  font-family:'Share Tech Mono', monospace;
+  font-size:12px;
+  color:var(--text-dim);
+  margin-bottom:16px;
+}
+
+.panel{
+  background:linear-gradient(180deg, var(--bg-panel2), var(--bg-panel));
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:18px;
+  position:relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+/* stats row */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-bottom:16px;
+}
+.stat{
+  flex:1;
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px 10px;
+  text-align:center;
+}
+.stat .label{
+  font-family:'Share Tech Mono', monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  color:var(--text-dim);
+  text-transform:uppercase;
+}
+.stat .value{
+  font-family:'Share Tech Mono', monospace;
+  font-size:20px;
+  font-weight:700;
+  color:var(--copper);
+  margin-top:2px;
+  font-variant-numeric: tabular-nums;
+}
+.stat.ghz .value{color:var(--amber);}
+
+/* die visual */
+.die-stage{
+  position:relative;
+  height:220px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:16px;
+}
+.heat-glow{
+  position:absolute;
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  filter:blur(30px);
+  opacity:0.55;
+  transition:background 0.3s ease;
+}
+.die{
+  position:relative;
+  width:130px;
+  height:130px;
+  border-radius:14px;
+  background:linear-gradient(145deg,#1b2e26,#0c1512);
+  border:2px solid var(--copper);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 0 0 6px rgba(201,150,60,0.08);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:2;
+}
+.die .label{
+  font-family:'Share Tech Mono', monospace;
+  font-size:9px;
+  color:var(--text-dim);
+  letter-spacing:2px;
+}
+.die .model{
+  font-family:'Rajdhani', sans-serif;
+  font-weight:700;
+  font-size:22px;
+  letter-spacing:1px;
+  color:var(--text-main);
+}
+.fan{
+  position:absolute;
+  width:190px;
+  height:190px;
+  z-index:3;
+  animation: spin 3s linear infinite;
+  opacity:0.9;
+  pointer-events:none;
+}
+@keyframes spin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+/* temp bar */
+.bar-row{margin-bottom:6px;}
+.bar-label{
+  display:flex;
+  justify-content:space-between;
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  color:var(--text-dim);
+  margin-bottom:4px;
+}
+.bar-track{
+  height:16px;
+  background:rgba(0,0,0,0.4);
+  border-radius:8px;
+  border:1px solid var(--line);
+  overflow:hidden;
+  position:relative;
+}
+.bar-fill{
+  height:100%;
+  border-radius:8px;
+  transition:width 0.15s linear, background 0.3s ease;
+}
+.bar-track.stamina .bar-fill{background:linear-gradient(90deg,#2b8fae,var(--cool));}
+
+.controls{
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+}
+button{
+  font-family:'Rajdhani', sans-serif;
+  font-weight:700;
+  font-size:16px;
+  letter-spacing:1px;
+  border:none;
+  border-radius:8px;
+  padding:14px 10px;
+  cursor:pointer;
+  transition:transform 0.08s ease, filter 0.15s ease;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:manipulation;
+}
+button:active{transform:scale(0.96);}
+.btn-cool{
+  flex:1;
+  background:linear-gradient(180deg,#3fc4dc,#1f8ba3);
+  color:#04201f;
+  box-shadow:0 4px 0 #14646f, 0 8px 18px rgba(63,196,220,0.25);
+}
+.btn-cool:disabled{
+  filter:grayscale(0.6) brightness(0.6);
+  cursor:not-allowed;
+}
+.hint{
+  text-align:center;
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color:var(--text-dim);
+  margin-top:8px;
+  letter-spacing:1px;
+}
+
+/* 360 popup */
+.popup-layer{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-end;
+  padding:16px;
+  pointer-events:none;
+  z-index:50;
+}
+.popup{
+  pointer-events:auto;
+  width:290px;
+  max-width:88vw;
+  background:#0d1a15;
+  border:1px solid #2a5c46;
+  border-left:4px solid var(--heat);
+  border-radius:8px;
+  padding:12px 14px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+  animation: slidein 0.25s ease;
+}
+@keyframes slidein{ from{transform:translateX(30px); opacity:0} to{transform:translateX(0); opacity:1} }
+.popup-head{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:6px;
+}
+.popup-icon{
+  width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, #6fe0a8, #1c8a52);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:#04140b;font-weight:700;
+  flex-shrink:0;
+}
+.popup-title{
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  color:#8fd6ac;
+  letter-spacing:1px;
+}
+.popup-body{
+  font-size:14px;
+  color:var(--text-main);
+  line-height:1.35;
+  margin-bottom:10px;
+}
+.popup-body b{color:var(--heat);}
+.popup-timerbar{
+  height:5px;
+  background:rgba(255,255,255,0.08);
+  border-radius:3px;
+  overflow:hidden;
+  margin-bottom:10px;
+}
+.popup-timerfill{
+  height:100%;
+  background:var(--heat);
+  transition:width 0.05s linear;
+}
+.popup-actions{display:flex; gap:8px;}
+.btn-ignore{
+  flex:1;
+  background:transparent;
+  color:var(--text-dim);
+  font-size:11px;
+  padding:7px 10px;
+  border:1px solid var(--line);
+  text-align:center;
+}
+
+/* mini-games */
+.popup-minigame{
+  margin-bottom:10px;
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:10px;
+}
+.mg-caption{
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color:var(--text-dim);
+  letter-spacing:1px;
+  margin-bottom:8px;
+  text-align:center;
+}
+.mg-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  margin-bottom:2px;
+}
+.mg-cell{
+  aspect-ratio:1;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--line);
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  cursor:pointer;
+  transition:transform 0.08s ease, background 0.15s ease;
+}
+.mg-cell:active{transform:scale(0.9);}
+.mg-grid.mg-shake{animation:mgshake 0.28s ease;}
+@keyframes mgshake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-5px);}
+  75%{transform:translateX(5px);}
+}
+.mg-scanbar{
+  height:14px;
+  background:rgba(0,0,0,0.4);
+  border:1px solid var(--line);
+  border-radius:7px;
+  overflow:hidden;
+  margin-bottom:8px;
+}
+.mg-scanfill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#4ce08a,#1c8a52);
+  transition:width 0.12s ease;
+}
+.mg-scanbtn, .mg-stopbtn{
+  width:100%;
+  background:linear-gradient(180deg,#4ce08a,#1c8a52);
+  color:#04140b;
+  font-size:13px;
+  padding:9px;
+  box-shadow:0 3px 0 #0f5c34;
+  border:none;
+  border-radius:8px;
+  font-family:'Rajdhani', sans-serif;
+  font-weight:700;
+  cursor:pointer;
+}
+.mg-scanbtn:active, .mg-stopbtn:active{transform:scale(0.97);}
+.mg-track{
+  position:relative;
+  height:26px;
+  background:rgba(0,0,0,0.4);
+  border:1px solid var(--line);
+  border-radius:7px;
+  margin-bottom:8px;
+  overflow:hidden;
+}
+.mg-zone{
+  position:absolute;
+  top:0; bottom:0;
+  background:rgba(76,224,138,0.28);
+  border-left:1px solid #4ce08a;
+  border-right:1px solid #4ce08a;
+}
+.mg-cursor{
+  position:absolute;
+  top:2px; bottom:2px;
+  width:4px;
+  background:var(--amber);
+  border-radius:2px;
+}
+.mg-progress{
+  text-align:center;
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  color:var(--text-dim);
+  margin-bottom:6px;
+}
+
+/* level-up banner */
+.level-banner{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) scale(0.85);
+  background:rgba(8,14,11,0.95);
+  border:1px solid var(--copper);
+  border-radius:10px;
+  padding:14px 22px;
+  text-align:center;
+  z-index:20;
+  pointer-events:none;
+  opacity:0;
+  animation: levelpop 1.7s ease forwards;
+  box-shadow:0 0 40px rgba(201,150,60,0.35);
+  white-space:nowrap;
+}
+.level-banner .lb-title{
+  font-family:'Rajdhani', sans-serif;
+  font-weight:700;
+  font-size:20px;
+  color:var(--copper);
+  letter-spacing:1px;
+}
+.level-banner .lb-sub{
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color:var(--text-dim);
+  margin-top:2px;
+}
+@keyframes levelpop{
+  0%{opacity:0; transform:translate(-50%,-50%) scale(0.8);}
+  12%{opacity:1; transform:translate(-50%,-50%) scale(1.05);}
+  20%{transform:translate(-50%,-50%) scale(1);}
+  78%{opacity:1;}
+  100%{opacity:0; transform:translate(-50%,-60%) scale(1);}
+}
+
+/* toast (small feedback) */
+.toast{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  top:-6px;
+  font-family:'Share Tech Mono', monospace;
+  font-size:12px;
+  font-weight:700;
+  padding:4px 10px;
+  border-radius:6px;
+  pointer-events:none;
+  animation: floatup 1s ease forwards;
+  white-space:nowrap;
+  z-index:10;
+}
+@keyframes floatup{
+  0%{opacity:0; transform:translate(-50%,10px);}
+  15%{opacity:1; transform:translate(-50%,0);}
+  100%{opacity:0; transform:translate(-50%,-30px);}
+}
+
+/* game over */
+.overlay{
+  position:fixed; inset:0;
+  background:rgba(5,8,7,0.92);
+  display:flex; align-items:center; justify-content:center;
+  z-index:100;
+  padding:20px;
+}
+.overlay .card{
+  background:var(--bg-panel);
+  border:1px solid var(--heat);
+  border-radius:12px;
+  padding:26px;
+  max-width:380px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 0 60px rgba(255,77,61,0.25);
+}
+.overlay h2{
+  font-size:24px;
+  color:var(--heat);
+  margin-bottom:6px;
+  letter-spacing:1px;
+}
+.overlay p.flavor{
+  font-family:'Share Tech Mono', monospace;
+  font-size:12px;
+  color:var(--text-dim);
+  margin-bottom:18px;
+}
+.result-row{
+  display:flex;
+  justify-content:space-between;
+  font-family:'Share Tech Mono', monospace;
+  font-size:13px;
+  border-top:1px solid var(--line);
+  padding:8px 2px;
+}
+.result-row span:last-child{color:var(--copper); font-weight:700;}
+.btn-restart{
+  margin-top:18px;
+  width:100%;
+  background:linear-gradient(180deg,#e8b04a,var(--copper));
+  color:#241705;
+  padding:13px;
+  font-size:15px;
+  box-shadow:0 4px 0 #8a6822;
+  border:none;
+  border-radius:8px;
+  font-family:'Rajdhani', sans-serif;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* shop */
+.shop-card{
+  max-width:420px;
+  text-align:left;
+}
+.shop-card h2{
+  color:var(--copper);
+  text-align:center;
+  margin-bottom:4px;
+}
+.shop-card .flavor{
+  text-align:center;
+  margin-bottom:14px;
+}
+.credits-row{
+  text-align:center;
+  font-family:'Share Tech Mono', monospace;
+  font-size:18px;
+  color:var(--amber);
+  margin-bottom:14px;
+  font-weight:700;
+}
+.shop-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  max-height:320px;
+  overflow-y:auto;
+  margin-bottom:16px;
+  padding-right:4px;
+}
+.shop-item{
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px 12px;
+}
+.shop-item-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:3px;
+}
+.shop-item-name{
+  font-weight:700;
+  font-size:14px;
+  color:var(--text-main);
+}
+.shop-item-lvl{
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  color:var(--text-dim);
+}
+.shop-item-desc{
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  color:var(--text-dim);
+  margin-bottom:8px;
+}
+.shop-buy-btn{
+  width:100%;
+  background:linear-gradient(180deg,#e8b04a,var(--copper));
+  color:#241705;
+  padding:8px;
+  font-size:13px;
+  border:none;
+  border-radius:6px;
+  font-family:'Rajdhani', sans-serif;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 3px 0 #8a6822;
+}
+.shop-buy-btn:disabled{
+  filter:grayscale(0.7) brightness(0.55);
+  cursor:not-allowed;
+  box-shadow:none;
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="eyebrow"><span id="levelLabel">УРОВЕНЬ 1</span><span id="clock">00:00</span></div>
+  <h1>ВЕНТИЛЯТОР <span>vs</span> ЗЕОН</h1>
+  <div class="subtitle">// он гонит частоту сам на себя. держи его живым.</div>
+
+  <div class="panel">
+    <div class="stats">
+      <div class="stat ghz">
+        <div class="label">Частота</div>
+        <div class="value" id="ghzVal">3.00 GHz</div>
+      </div>
+      <div class="stat">
+        <div class="label">Убрано майнеров</div>
+        <div class="value" id="minerVal">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Выжито</div>
+        <div class="value" id="timeVal">0с</div>
+      </div>
+      <div class="stat">
+        <div class="label">Кредиты</div>
+        <div class="value" id="creditsVal">0</div>
+      </div>
+    </div>
+
+    <div class="die-stage">
+      <div class="heat-glow" id="heatGlow"></div>
+      <svg class="fan" id="fanSvg" viewBox="0 0 100 100">
+        <g fill="#7fa896" opacity="0.85">
+          <ellipse cx="50" cy="26" rx="9" ry="20"/>
+          <ellipse cx="74" cy="63" rx="9" ry="20" transform="rotate(120 74 63)"/>
+          <ellipse cx="26" cy="63" rx="9" ry="20" transform="rotate(240 26 63)"/>
+        </g>
+        <circle cx="50" cy="50" r="8" fill="#0c1512" stroke="#c9963c" stroke-width="2"/>
+      </svg>
+      <div class="die">
+        <div class="label">INTEL INSIDE-ISH</div>
+        <div class="model">ЗЕОН</div>
+        <div class="label" id="tempLabel">30°C</div>
+      </div>
+    </div>
+
+    <div class="bar-row" style="position:relative;">
+      <div class="bar-label"><span>ДО СЛЕДУЮЩЕГО УРОВНЯ</span><span id="levelPct">0%</span></div>
+      <div class="bar-track"><div class="bar-fill" id="levelFill" style="width:0%; background:linear-gradient(90deg,#8a6822,var(--copper));"></div></div>
+    </div>
+
+    <div class="bar-row" style="position:relative;">
+      <div class="bar-label"><span>ТЕМПЕРАТУРА ЯДРА</span><span id="tempPct">30%</span></div>
+      <div class="bar-track"><div class="bar-fill" id="tempFill" style="width:30%; background:linear-gradient(90deg,#3fc4dc,#5ad1e0);"></div></div>
+    </div>
+
+    <div class="bar-row" style="position:relative;">
+      <div class="bar-label"><span>РЕСУРС ВЕНТИЛЯТОРА</span><span id="staminaPct">100%</span></div>
+      <div class="bar-track stamina"><div class="bar-fill" id="staminaFill" style="width:100%;"></div></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-cool" id="coolBtn">🌀 ДУТЬ НА ЗЕОН</button>
+    </div>
+    <div class="hint">жми пробел или кнопку, чтобы гнать воздух — вентилятор устаёт, дай ему отдохнуть</div>
+  </div>
+</div>
+
+<div class="popup-layer" id="popupLayer"></div>
+
+<div class="overlay" id="overlay" style="display:none;">
+  <div class="card">
+    <h2 id="overTitle">ЗЕОН РАСПЛАВИЛСЯ</h2>
+    <p class="flavor" id="overFlavor">// термопаста превратилась в термопасту-суп</p>
+    <div class="result-row"><span>Достигнутый уровень</span><span id="resLevel">—</span></div>
+    <div class="result-row"><span>Максимальная частота</span><span id="resGhz">—</span></div>
+    <div class="result-row"><span>Майнеров зачищено</span><span id="resMiners">—</span></div>
+    <div class="result-row"><span>Продержался</span><span id="resTime">—</span></div>
+    <button class="btn-restart" id="restartBtn">ПЕРЕЗАПУСТИТЬ ЗЕОН</button>
+  </div>
+</div>
+
+<div class="overlay" id="shopOverlay" style="display:none;">
+  <div class="card shop-card">
+    <h2>МАГАЗИН УЛУЧШЕНИЙ</h2>
+    <p class="flavor">// уровень пройден — потрать заработанное, пока Зеон отдыхает</p>
+    <div class="credits-row">💰 <span id="shopCredits">0</span></div>
+    <div class="shop-list" id="shopList"></div>
+    <button class="btn-restart" id="shopContinueBtn">ПРОДОЛЖИТЬ РАЗГОН</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const die = document.querySelector('.die');
+  const heatGlow = document.getElementById('heatGlow');
+  const fanSvg = document.getElementById('fanSvg');
+  const ghzVal = document.getElementById('ghzVal');
+  const minerVal = document.getElementById('minerVal');
+  const timeVal = document.getElementById('timeVal');
+  const clock = document.getElementById('clock');
+  const tempFill = document.getElementById('tempFill');
+  const tempPct = document.getElementById('tempPct');
+  const tempLabel = document.getElementById('tempLabel');
+  const staminaFill = document.getElementById('staminaFill');
+  const staminaPct = document.getElementById('staminaPct');
+  const levelFill = document.getElementById('levelFill');
+  const levelPct = document.getElementById('levelPct');
+  const levelLabel = document.getElementById('levelLabel');
+  const coolBtn = document.getElementById('coolBtn');
+  const popupLayer = document.getElementById('popupLayer');
+  const overlay = document.getElementById('overlay');
+  const restartBtn = document.getElementById('restartBtn');
+  const shopOverlay = document.getElementById('shopOverlay');
+  const shopCredits = document.getElementById('shopCredits');
+  const shopList = document.getElementById('shopList');
+  const shopContinueBtn = document.getElementById('shopContinueBtn');
+  const creditsVal = document.getElementById('creditsVal');
+  const dieStage = document.querySelector('.die-stage');
+
+  let state;
+
+  function levelDuration(level){
+    // levels get shorter (and thus tighter) as you go, floor at 18s
+    return Math.max(18, 42 - (level-1)*3);
+  }
+
+  function freshState(){
+    return {
+      ghz: 3.0,
+      temp: 30,
+      stamina: 100,
+      minersRemoved: 0,
+      elapsed: 0,
+      level: 1,
+      levelTimer: 0,
+      running: true,
+      paused: false,
+      credits: 0,
+      upg: { paste:0, fan:0, stamina:0, shield:0 },
+      lastEventAt: 0,
+      nextEventIn: 7 + Math.random()*4,
+      lastTs: null,
+    };
+  }
+
+  const upgradeDefs = [
+    { key:'paste',   name:'Термопаста получше',        desc:'Зеон греется медленнее',                 baseCost:18, inc:14, max:6 },
+    { key:'fan',     name:'Мощнее вентилятор',          desc:'Каждый вдох охлаждает сильнее',          baseCost:16, inc:13, max:6 },
+    { key:'stamina', name:'Смазка подшипников',         desc:'Вентилятор восстанавливается быстрее',   baseCost:15, inc:12, max:6 },
+    { key:'shield',  name:'Кэш 360 Total Security',     desc:'Больше времени на мини-игры от 360',     baseCost:20, inc:16, max:5 },
+  ];
+
+  const eventFlavors = [
+    {
+      body: "Обнаружен подозрительный процесс <b>miner.exe</b> из архива <b>Игра_Repack_by_torrent.rar</b>. Грузит все ядра Зеона.",
+      okToast: "360: угроза устранена",
+      failToast: "майнер разогнал Зеон!"
+    },
+    {
+      body: "Скачанный <b>keygen_FINAL_v2.exe</b> внезапно решил майнить крипту в фоне. Зеон недоволен.",
+      okToast: "процесс убит",
+      failToast: "фоновый майнинг разогнал ядро!"
+    },
+    {
+      body: "Из торрента <b>Photoshop_Portable_2077</b> вылез скрытый майнер и подгружает ядро Зеона под ноль.",
+      okToast: "угроза нейтрализована",
+      failToast: "скрытый майнер прогрел чип!"
+    },
+    {
+      body: "360 Total Security засекла: <b>WinRAR_Crack_NO_VIRUS.exe</b> тайно майнит на всех потоках.",
+      okToast: "чисто, можно выдохнуть",
+      failToast: "крак был не такой уж и NO_VIRUS!"
+    }
+  ];
+
+  function heatColor(t){
+    // 0 cool cyan -> 50 amber -> 100 red
+    if(t < 50){
+      const k = t/50;
+      return lerpColor([79,216,232], [255,176,32], k);
+    } else {
+      const k = (t-50)/50;
+      return lerpColor([255,176,32],[255,77,61], k);
+    }
+  }
+  function lerpColor(a,b,k){
+    const r = Math.round(a[0]+(b[0]-a[0])*k);
+    const g = Math.round(a[1]+(b[1]-a[1])*k);
+    const bl = Math.round(a[2]+(b[2]-a[2])*k);
+    return `rgb(${r},${g},${bl})`;
+  }
+
+  function render(){
+    ghzVal.textContent = state.ghz.toFixed(2) + ' GHz';
+    minerVal.textContent = state.minersRemoved;
+    const mins = Math.floor(state.elapsed/60).toString().padStart(2,'0');
+    const secs = Math.floor(state.elapsed%60).toString().padStart(2,'0');
+    clock.textContent = mins+':'+secs;
+    timeVal.textContent = Math.floor(state.elapsed) + 'с';
+    creditsVal.textContent = state.credits;
+    levelLabel.textContent = 'УРОВЕНЬ ' + state.level;
+
+    const lp = Math.max(0, Math.min(100, (state.levelTimer/levelDuration(state.level))*100));
+    levelFill.style.width = lp+'%';
+    levelPct.textContent = Math.round(lp)+'%';
+
+    const t = Math.max(0, Math.min(100, state.temp));
+    tempFill.style.width = t+'%';
+    tempPct.textContent = Math.round(t)+'%';
+    tempLabel.textContent = Math.round(30 + t*0.9) + '°C';
+    const col = heatColor(t);
+    tempFill.style.background = col;
+    heatGlow.style.background = `radial-gradient(circle, ${col} 0%, transparent 70%)`;
+    heatGlow.style.opacity = 0.35 + (t/100)*0.4;
+
+    const st = Math.max(0, Math.min(100, state.stamina));
+    staminaFill.style.width = st+'%';
+    staminaPct.textContent = Math.round(st)+'%';
+    const coolCost = Math.max(6, 10 - state.upg.fan*0.6);
+    coolBtn.disabled = st < coolCost || state.paused;
+
+    const fanSpeed = 3 - Math.min(2.2, state.ghz*0.15);
+    fanSvg.style.animationDuration = Math.max(0.35, fanSpeed) + 's';
+  }
+
+  function showToast(text, color){
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = text;
+    el.style.color = color || '#5ad1e0';
+    el.style.background = 'rgba(0,0,0,0.55)';
+    el.style.border = '1px solid '+(color||'#5ad1e0');
+    dieStage.style.position='relative';
+    dieStage.appendChild(el);
+    setTimeout(()=>el.remove(), 1000);
+  }
+
+  function showLevelBanner(level, earned){
+    const el = document.createElement('div');
+    el.className = 'level-banner';
+    el.innerHTML = `<div class="lb-title">УРОВЕНЬ ${level}</div><div class="lb-sub">зеон подкрутил себе разгон · +${earned} 💰</div>`;
+    dieStage.appendChild(el);
+    setTimeout(()=>el.remove(), 1700);
+  }
+
+  function levelUp(){
+    state.level += 1;
+    state.levelTimer = 0;
+    // a small breather so the jump isn't an instant death, but the base
+    // difficulty from here on (heat, event pace, minigames) is permanently higher
+    state.temp = Math.max(20, state.temp - 22);
+    state.stamina = 100;
+    state.paused = true;
+    const earned = 15 + state.level*4;
+    state.credits += earned;
+    showLevelBanner(state.level, earned);
+    render();
+    setTimeout(openShop, 1100);
+  }
+
+  function costOf(def){
+    return def.baseCost + state.upg[def.key]*def.inc;
+  }
+
+  function renderShopList(){
+    shopCredits.textContent = state.credits;
+    shopList.innerHTML = upgradeDefs.map(def=>{
+      const owned = state.upg[def.key];
+      const maxed = owned >= def.max;
+      const cost = costOf(def);
+      const afford = state.credits >= cost && !maxed;
+      return `<div class="shop-item">
+        <div class="shop-item-head"><span class="shop-item-name">${def.name}</span><span class="shop-item-lvl">${owned}/${def.max}</span></div>
+        <div class="shop-item-desc">${def.desc}</div>
+        <button class="shop-buy-btn" data-key="${def.key}" ${(maxed||!afford) ? 'disabled' : ''}>${maxed ? 'МАКС' : ('Купить — '+cost+' 💰')}</button>
+      </div>`;
+    }).join('');
+    shopList.querySelectorAll('.shop-buy-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        buyUpgrade(btn.dataset.key);
+      });
+    });
+  }
+
+  function buyUpgrade(key){
+    const def = upgradeDefs.find(d=>d.key===key);
+    const owned = state.upg[key];
+    if(owned >= def.max) return;
+    const cost = costOf(def);
+    if(state.credits < cost) return;
+    state.credits -= cost;
+    state.upg[key] += 1;
+    renderShopList();
+    render();
+  }
+
+  function openShop(){
+    renderShopList();
+    shopOverlay.style.display = 'flex';
+  }
+
+  function closeShop(){
+    shopOverlay.style.display = 'none';
+    state.paused = false;
+    state.lastTs = null;
+  }
+
+  shopContinueBtn.addEventListener('click', closeShop);
+
+  function doCool(){
+    if(!state.running || state.paused) return;
+    const cost = Math.max(6, 10 - state.upg.fan*0.6);
+    if(state.stamina < cost) return;
+    state.stamina -= cost;
+    state.temp -= 5.5 + state.upg.fan*1.1;
+    if(state.temp < 0) state.temp = 0;
+    render();
+  }
+
+  coolBtn.addEventListener('pointerdown', doCool);
+  window.addEventListener('keydown', (e)=>{
+    if(e.code === 'Space'){ e.preventDefault(); doCool(); }
+  });
+
+  let activePopup = null;
+
+  function spawnEvent(){
+    if(!state.running || activePopup) return;
+    const flavor = eventFlavors[Math.floor(Math.random()*eventFlavors.length)];
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+    // difficulty ramps up over ~2.5 minutes of survival, then stays maxed
+    const diff = Math.min(1, state.elapsed/150 + (state.level-1)*0.12);
+    const dur = 6500 - diff*2000 + state.upg.shield*350;
+    let start = performance.now();
+    popup.innerHTML = `
+      <div class="popup-head">
+        <div class="popup-icon">360</div>
+        <div class="popup-title">360 TOTAL SECURITY — УГРОЗА</div>
+      </div>
+      <div class="popup-body">${flavor.body}</div>
+      <div class="popup-timerbar"><div class="popup-timerfill" style="width:100%"></div></div>
+      <div class="popup-minigame"></div>
+      <div class="popup-actions">
+        <button class="btn-ignore">Игнорировать угрозу</button>
+      </div>
+    `;
+    popupLayer.appendChild(popup);
+    activePopup = true;
+
+    const timerFill = popup.querySelector('.popup-timerfill');
+    const mgContainer = popup.querySelector('.popup-minigame');
+
+    // resolved is local to this popup — no shared mutable state to race on
+    let resolved = false;
+
+    function onPenalty(ms){
+      // wrong guesses eat into the remaining time instead of being free
+      start -= ms;
+    }
+
+    const mgBuilders = [buildSpotGame, buildScanGame, buildReflexGame];
+    const mgCleanup = mgBuilders[Math.floor(Math.random()*mgBuilders.length)](
+      mgContainer, ()=>resolve(true), diff, onPenalty
+    );
+
+    function tick(){
+      if(resolved) return;
+      const elapsed = performance.now()-start;
+      const pct = Math.max(0, 100 - (elapsed/dur)*100);
+      timerFill.style.width = pct+'%';
+      if(elapsed >= dur){
+        resolve(false);
+        return;
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    function resolve(success){
+      if(resolved) return;
+      resolved = true;
+      activePopup = null;
+      if(mgCleanup) mgCleanup();
+      if(success){
+        state.minersRemoved += 1;
+        state.temp -= 10;
+        if(state.temp<0) state.temp=0;
+        showToast(flavor.okToast, '#4ce08a');
+      } else {
+        state.temp += 25;
+        state.ghz += 0.15;
+        showToast(flavor.failToast, '#ff4d3d');
+      }
+      popup.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+      popup.style.opacity = '0';
+      popup.style.transform = 'translateX(30px)';
+      setTimeout(()=>{ popup.remove(); }, 200);
+      render();
+    }
+
+    popup.querySelector('.btn-ignore').addEventListener('click', ()=>resolve(false));
+  }
+
+  // --- mini-games: each returns a cleanup() function (or null) ---
+
+  function buildSpotGame(container, onSuccess, diff, onPenalty){
+    const size = diff > 0.5 ? 4 : 3;
+    const total = size*size;
+    container.innerHTML = `<div class="mg-caption">найди и убери майнер среди файлов — промах стоит времени</div><div class="mg-grid" style="grid-template-columns:repeat(${size},1fr);"></div>`;
+    const grid = container.querySelector('.mg-grid');
+    const clean = ['📁','🗂️','📄','🗃️'];
+    let done = false;
+    function place(){
+      grid.innerHTML = '';
+      const badIndex = Math.floor(Math.random()*total);
+      for(let i=0;i<total;i++){
+        const cell = document.createElement('div');
+        cell.className = 'mg-cell';
+        cell.textContent = i===badIndex ? '⛏️' : clean[Math.floor(Math.random()*clean.length)];
+        cell.addEventListener('click', ()=>{
+          if(done) return;
+          if(i===badIndex){
+            done = true;
+            onSuccess();
+          } else {
+            onPenalty(450 + diff*250);
+            grid.classList.remove('mg-shake');
+            void grid.offsetWidth;
+            grid.classList.add('mg-shake');
+            place();
+          }
+        });
+        grid.appendChild(cell);
+      }
+    }
+    place();
+    return function cleanup(){ done = true; };
+  }
+
+  function buildScanGame(container, onSuccess, diff){
+    container.innerHTML = `<div class="mg-caption">жми «Сканировать» — процесс сопротивляется и утекает назад</div>
+      <div class="mg-scanbar"><div class="mg-scanfill"></div></div>
+      <button class="mg-scanbtn" type="button">СКАНИРОВАТЬ 🔍</button>`;
+    const fill = container.querySelector('.mg-scanfill');
+    const btn = container.querySelector('.mg-scanbtn');
+    let progress = 0;
+    let done = false;
+    const decay = 2 + diff*3.5;
+    const decayTimer = setInterval(()=>{
+      if(done) return;
+      progress = Math.max(0, progress - decay);
+      fill.style.width = progress+'%';
+    }, 200);
+    btn.addEventListener('click', ()=>{
+      if(done) return;
+      progress += 8 + Math.random()*8 - diff*2;
+      progress = Math.max(0, progress);
+      fill.style.width = Math.min(100,progress)+'%';
+      if(progress >= 100){
+        done = true;
+        clearInterval(decayTimer);
+        onSuccess();
+      }
+    });
+    return function cleanup(){ done = true; clearInterval(decayTimer); };
+  }
+
+  function buildReflexGame(container, onSuccess, diff){
+    const needHits = 2;
+    container.innerHTML = `<div class="mg-caption">жми «Стоп», когда курсор в зелёной зоне (${needHits} раза)</div>
+      <div class="mg-progress">0 / ${needHits}</div>
+      <div class="mg-track"><div class="mg-zone"></div><div class="mg-cursor"></div></div>
+      <button class="mg-stopbtn" type="button">СТОП!</button>`;
+    const track = container.querySelector('.mg-track');
+    const zoneEl = container.querySelector('.mg-zone');
+    const cursorEl = container.querySelector('.mg-cursor');
+    const progressEl = container.querySelector('.mg-progress');
+    const btn = container.querySelector('.mg-stopbtn');
+    let hits = 0;
+    let done = false;
+    let zoneStart = 30 + Math.random()*12;
+    let zoneWidth = 30 - diff*4;
+    zoneEl.style.left = zoneStart+'%';
+    zoneEl.style.width = zoneWidth+'%';
+    let pos = 0;
+    let dir = 1;
+    let raf = null;
+    let speed = 0.65 + diff*0.35;
+    function anim(){
+      pos += dir*speed;
+      if(pos >= 100){ pos = 100; dir = -1; }
+      if(pos <= 0){ pos = 0; dir = 1; }
+      cursorEl.style.left = pos+'%';
+      raf = requestAnimationFrame(anim);
+    }
+    raf = requestAnimationFrame(anim);
+    btn.addEventListener('click', ()=>{
+      if(done) return;
+      const inZone = pos >= zoneStart && pos <= zoneStart+zoneWidth;
+      if(inZone){
+        hits += 1;
+        progressEl.textContent = hits+' / '+needHits;
+        speed += 0.2;
+        zoneWidth = Math.max(18, zoneWidth-2);
+        zoneEl.style.width = zoneWidth+'%';
+        if(hits >= needHits){
+          done = true;
+          if(raf) cancelAnimationFrame(raf);
+          onSuccess();
+        }
+      } else {
+        track.style.transition = 'background 0.15s ease';
+        track.style.background = 'rgba(255,77,61,0.25)';
+        setTimeout(()=>{ track.style.background = ''; }, 150);
+      }
+    });
+    return function cleanup(){ done = true; if(raf) cancelAnimationFrame(raf); };
+  }
+
+  function endGame(){
+    state.running = false;
+    overlay.style.display = 'flex';
+    document.getElementById('resLevel').textContent = state.level;
+    document.getElementById('resGhz').textContent = state.ghz.toFixed(2)+' GHz';
+    document.getElementById('resMiners').textContent = state.minersRemoved;
+    const mins = Math.floor(state.elapsed/60);
+    const secs = Math.floor(state.elapsed%60);
+    document.getElementById('resTime').textContent = mins+'м '+secs+'с';
+    const flavors = [
+      "// термопаста превратилась в термопасту-суп",
+      "// вентилятор сгорел раньше совести майнера",
+      "// 360 Total Security опоздала на пять секунд",
+      "// зеон ушёл в закат на частоте, которую физика не одобряла"
+    ];
+    document.getElementById('overFlavor').textContent = flavors[Math.floor(Math.random()*flavors.length)];
+  }
+
+  function loop(ts){
+    if(state.lastTs === null) state.lastTs = ts;
+    const dt = Math.min(0.1, (ts - state.lastTs)/1000);
+    state.lastTs = ts;
+
+    if(state.running && !state.paused){
+      state.elapsed += dt;
+      state.levelTimer += dt;
+
+      const levelMult = 1 + (state.level-1)*0.15;
+
+      // zeon overclocks itself endlessly, and gets greedier the longer it lives
+      state.ghz += dt * (0.018 + state.ghz*0.0034 + state.elapsed*0.00012) * levelMult;
+
+      // heat generation scales with ghz — noticeably less forgiving now, but better thermal paste helps
+      const pasteReduction = Math.min(0.42, state.upg.paste*0.07);
+      const heatRate = (1.5 + (state.ghz-3.0)*1.25) * levelMult * (1 - pasteReduction);
+      state.temp += heatRate * dt;
+
+      // stamina regen — the fan tires faster than it recovers, unless the bearings are lubed
+      state.stamina = Math.min(100, state.stamina + dt*(6.5 + state.upg.stamina*1.4));
+
+      // survive the level's clock and things get a breather but permanently harder
+      if(state.levelTimer >= levelDuration(state.level) && !activePopup){
+        levelUp();
+      }
+
+      if(state.temp >= 100){
+        state.temp = 100;
+        render();
+        endGame();
+        return;
+      }
+
+      state.nextEventIn -= dt;
+      if(state.nextEventIn <= 0 && !activePopup){
+        spawnEvent();
+        const floorTime = Math.max(2, 3.5 - (state.level-1)*0.2);
+        state.nextEventIn = 11 + Math.random()*8 - Math.min(8, state.elapsed*0.045);
+        state.nextEventIn = Math.max(floorTime, state.nextEventIn);
+      }
+
+      render();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  function start(){
+    state = freshState();
+    overlay.style.display = 'none';
+    shopOverlay.style.display = 'none';
+    popupLayer.innerHTML = '';
+    activePopup = null;
+    render();
+    requestAnimationFrame(loop);
+  }
+
+  restartBtn.addEventListener('click', start);
+
+  start();
+})();
+</script>
+</body>
+</html>
